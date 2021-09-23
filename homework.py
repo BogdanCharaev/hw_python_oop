@@ -72,8 +72,7 @@ class Calculator:
 
     def get_limit_remained(self):
         """Считает сегодняшний лимит."""
-        today_stats = self.get_today_stats()
-        return self.limit - today_stats
+        return self.limit - self.get_today_stats()
 
     def get_week_stats(self):
         """Показывает расход за неделю"""
