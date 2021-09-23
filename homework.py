@@ -112,14 +112,14 @@ class CashCalculator(Calculator):
             'rub': (1, 'руб')
         }
 
-        if currency.casefold() not in currences:
+        if currency not in currences:
             return 'Валюта не представлена в списке валют.'
         limit_remained = self.get_limit_remained()
 
         if limit_remained == 0:
             return 'Денег нет, держись'
 
-        rate, name = currences[currency.casefold()]
+        rate, name = currences[currency]
         limit_remained = currency_converter(limit_remained, rate)
 
         if limit_remained > 0:
