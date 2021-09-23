@@ -1,5 +1,7 @@
 from datetime import datetime as dt, timedelta
 
+DATE_FORMAT = '%d.%m.%Y'
+
 
 class Record:
     """Класс Record принимает запись с параметрами: кол-во, коммент, дата."""
@@ -7,7 +9,7 @@ class Record:
         self.amount = amount
         self.comment = comment
         if date:
-            self.date = parse_dmy(date)
+            self.date = dt.strptime(date, DATE_FORMAT).date()
         else:
             self.date = now_formated()
 
@@ -15,12 +17,6 @@ class Record:
         return (f'amount = {self.amount}, '
                 f'comment = {self.comment}, '
                 f'date = {self.date}')
-
-
-def parse_dmy(dmy):
-    """Парсит день/месяц/год и возвращает объект datetime."""
-    day, mon, year = dmy.split('.')
-    return dt(day=int(day), month=int(mon), year=int(year)).date()
 
 
 def now_formated():
@@ -42,8 +38,7 @@ def format_two_decimal_places(number):
 
 def currency_converter(number, currency):
     """Конвертирует число number по курсу currency."""
-    result = number / currency
-    return result
+    return number / currency
 
 
 def abs_and_two_decimal_places(number):
@@ -70,11 +65,10 @@ class Calculator:
     def get_today_stats(self):
         """Считает статы сегодня."""
         today_date = now_formated()
-        today_stats = 0
-        for record in self.records:
-            if record.date == today_date:
-                today_stats += record.amount
-        return today_stats
+        return sum(
+            record.amount for record in self.records
+            if record.date == today_date
+        )
 
     def get_limit_remained(self):
         """Считает сегодняшний лимит."""
@@ -83,13 +77,12 @@ class Calculator:
 
     def get_week_stats(self):
         """Показывает расход за неделю"""
-        week_stats = 0
         delta_date = (dt.now() - timedelta(days=7)).date()
         now_date = dt.now().date()
-        for record in self.records:
-            if now_date >= record.date >= delta_date:
-                week_stats += record.amount
-        return week_stats
+        return sum(
+            record.amount for record in self.records
+            if now_date >= record.date >= delta_date
+        )
 
 
 class CaloriesCalculator(Calculator):
@@ -100,8 +93,7 @@ class CaloriesCalculator(Calculator):
         if limit_remained > 0:
             return(f'Сегодня можно съесть что-нибудь ещё, '
                    f'но с общей калорийностью не более {limit_remained} кКал')
-        else:
-            return('Хватит есть!')
+        return('Хватит есть!')
 
 
 class CashCalculator(Calculator):
